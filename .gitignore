@@ -1,0 +1,6 @@
+node_modules
+*.vim
+setup_dev_javascript.sh
+.tern-project
+# *.stl
+bundle.js
