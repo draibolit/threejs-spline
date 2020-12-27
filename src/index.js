@@ -26,24 +26,48 @@ let cameraCtrl = new TrackballControls(camera, renderer.domElement);
 
 const size = 100;
 const divisions = 10;
-const gridHelper = new THREE.GridHelper( size, divisions );
-scene.add( gridHelper );
+const gridHelper = new THREE.GridHelper(size, divisions);
+scene.add(gridHelper);
 
-// Mesh
-let jaw;
-var loader = new STLLoader();
-loader.load("upperjaw.stl", function (geo) {
-  // let mat = new THREE.MeshPhongMaterial({
-  //   color: "blue",
-  //   flatShading: true,
-  //   side: THREE.DoubleSide,
-  //   // transparent: true,
-  //   // opacity:  0.5,
-  // });
-  let mat = new THREE.MeshNormalMaterial();
-  jaw = new THREE.Mesh(geo, mat)
-  scene.add(jaw);
+// smooth my curve over this many points
+let vectorArr1 = [];
+vectorArr1.push(new THREE.Vector3(-10, 0, 0));
+vectorArr1.push(new THREE.Vector3(-5, 15, 0));
+vectorArr1.push(new THREE.Vector3(20, 15, 0));
+vectorArr1.push(new THREE.Vector3(10, 0, 0));
+
+let vectorArr2 = [];
+vectorArr2.push(new THREE.Vector3(0, 0, 0));
+vectorArr2.push(new THREE.Vector3(0, 200, 0));
+vectorArr2.push(new THREE.Vector3(150, 150, 0));
+vectorArr2.push(new THREE.Vector3(150, 50, 0));
+
+// let spline = new THREE.CubicBezierCurve3(vectorArr1[0], vectorArr1[1], vectorArr1[2], vectorArr1[3]);
+let spline = new THREE.CubicBezierCurve3(
+  vectorArr2[0],
+  vectorArr2[1],
+  vectorArr2[2],
+  vectorArr2[3]
+);
+let material = new THREE.LineBasicMaterial({
+  color: 0xff00f0,
 });
+let numPoints = 100;
+let splinePoints = spline.getPoints(numPoints);
+// let geometry = new THREE.Geometry();
+// for(let i = 0; i < splinePoints.length; i++){
+//     geometry.vertices.push(splinePoints[i]);
+// }
+let geometry = new THREE.BufferGeometry().setFromPoints(splinePoints);
+let line = new THREE.Line(geometry, material);
+scene.add(line);
+
+for (let i=0; i < vectorArr2.length; i++) {
+  let geo = new THREE.SphereGeometry(3, 32, 32);
+  let mesh = new THREE.Mesh(geo, new THREE.MeshNormalMaterial());
+  mesh.position.copy(vectorArr2[i]);
+  scene.add(mesh);
+}
 
 renderer.setAnimationLoop(() => {
   cameraCtrl.update();
