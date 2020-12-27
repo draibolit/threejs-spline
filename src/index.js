@@ -30,22 +30,24 @@ const divisions = 10;
 const gridHelper = new THREE.GridHelper(size, divisions);
 scene.add(gridHelper);
 
-let vectorArr1 = [];
-vectorArr1.push(new THREE.Vector3(-10, 0, 0));
-vectorArr1.push(new THREE.Vector3(-5, 15, 0));
-vectorArr1.push(new THREE.Vector3(20, 15, 0));
-vectorArr1.push(new THREE.Vector3(10, 0, 0));
+let vectorArr1 = [
+new THREE.Vector3(-10, 0, 0),
+new THREE.Vector3(-5, 15, 0),
+new THREE.Vector3(20, 15, 0),
+new THREE.Vector3(10, 0, 0),
+];
 
-let vectorArr2 = [];
-vectorArr2.push(new THREE.Vector3( -10, 0, 10 ));
-vectorArr2.push(new THREE.Vector3( -5, 5, 5 ));
-vectorArr2.push(new THREE.Vector3( 0, 0, 0 ));
-vectorArr2.push(new THREE.Vector3( 5, -5, 5 ));
-vectorArr2.push(new THREE.Vector3( 10, 0, 10 ));
+let vectorArr2 = [
+new THREE.Vector3( -10, 0, 10 ),
+new THREE.Vector3( -5, 5, 5 ),
+new THREE.Vector3( 0, 0, 0 ),
+new THREE.Vector3( 5, -5, 5 ),
+new THREE.Vector3( 10, 0, 10 )
+];
 
 
-let vectorArr = vectorArr1;
-// let vectorArr = vectorArr2;
+// let vectorArr = vectorArr1;
+let vectorArr = vectorArr2;
 
 let benzier = createBenzier(vectorArr, 100);
 scene.add(benzier);
@@ -53,7 +55,7 @@ scene.add(benzier);
 let spline = createSpline(vectorArr, 100);
 scene.add(spline);
 
-let balls = createBalls(vectorArr, 1);
+let balls = createBalls(vectorArr, 0.5);
 scene.add(...balls);
 
 

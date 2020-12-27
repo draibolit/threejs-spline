@@ -1,24 +1,26 @@
 import * as THREE from "three";
 
+function createLineFromPoints(points, color){
+  let material = new THREE.LineBasicMaterial({
+    color: color,
+  });
+  let geometry = new THREE.BufferGeometry().setFromPoints(points);
+  let line = new THREE.Line(geometry, material);
+  return line
+}
+
 function createBenzier(vector3Array, numPoints) {
   let spline = new THREE.CubicBezierCurve3(...vector3Array); //pass members of Arr
-  let material = new THREE.LineBasicMaterial({
-    color: 0xff00f0,
-  });
   let splinePoints = spline.getPoints(numPoints);
-  let geometry = new THREE.BufferGeometry().setFromPoints(splinePoints);
-  let line = new THREE.Line(geometry, material);
+  let line = createLineFromPoints(splinePoints, 'blue');
   return line;
 }
 
 function createSpline(vector3Array, numPoints) {
-  let spline = new THREE.CatmullRomCurve3(vector3Array); // pass an array
-  let material = new THREE.LineBasicMaterial({
-    color: 0xff00f0,
-  });
+  // let spline = new THREE.CatmullRomCurve3(vector3Array); // pass an array
+  let spline = new THREE.CatmullRomCurve3(vector3Array, true); // pass an array
   let splinePoints = spline.getPoints(numPoints);
-  let geometry = new THREE.BufferGeometry().setFromPoints(splinePoints);
-  let line = new THREE.Line(geometry, material);
+  let line = createLineFromPoints(splinePoints, 'green');
   return line;
 }
 
