@@ -17,8 +17,8 @@ function createBenzier(vector3Array, numPoints) {
 }
 
 function createSpline(vector3Array, numPoints) {
-  // let spline = new THREE.CatmullRomCurve3(vector3Array); // pass an array
-  let spline = new THREE.CatmullRomCurve3(vector3Array, true); // pass an array
+  let spline = new THREE.CatmullRomCurve3(vector3Array); // pass an array
+  // let spline = new THREE.CatmullRomCurve3(vector3Array, true); // pass an array
   let splinePoints = spline.getPoints(numPoints);
   let line = createLineFromPoints(splinePoints, 'green');
   return line;
