@@ -1,10 +1,9 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { TransformControls } from "three/examples/jsm/controls/TransformControls.js";
 import { GUI } from "three/examples/jsm/libs/dat.gui.module.js";
 
 class Spline {
-  constructor(scene, camera, renderer, new_positions) {
+  constructor(scene, new_positions) {
     this.boxGeo = new THREE.BoxBufferGeometry(20, 20, 20); //const
     this.splineHelperObjects = [];
     this.splinePointsLength = 4; //const
@@ -29,8 +28,6 @@ class Spline {
       "position",
       new THREE.BufferAttribute(new Float32Array(this.ARC_SEGMENTS * 3), 3)
     );
-
-    this.initControls(camera, renderer);
 
     let scope = this;
     // Gui
@@ -80,17 +77,13 @@ class Spline {
     this.updateSplineOutline();
   }
 
-  initControls(camera, renderer) {
-    this.controls = new OrbitControls(camera, renderer.domElement);
-    this.controls.damping = 0.2;
-    // this.controls.addEventListener( 'change', render );
+  initControls(camera, cameraCtrl, renderer) {
     this.transformControl = new TransformControls(camera, renderer.domElement);
-    // this.transformControl.addEventListener( 'change', render );
     let scope = this;
     this.transformControl.addEventListener(
       "dragging-changed",
       function (event) {
-        scope.controls.enabled = !event.value;
+        cameraCtrl.enabled = !event.value;
       }
     );
     this.scene.add(this.transformControl);

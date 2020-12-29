@@ -1,5 +1,6 @@
 "use strict";
 import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import Stats from "three/examples/jsm/libs/stats.module.js";
 
 import { Spline } from "./spline";
@@ -66,11 +67,15 @@ function init() {
   document.addEventListener("pointerup", onPointerUp, false);
   document.addEventListener("pointermove", onPointerMove, false);
 
+  // Camera control
+let cameraCtrl = new OrbitControls(camera, renderer.domElement);
+cameraCtrl.damping = 0.2;
+
   /*******
    * Curves
    *********/
 
-  spline = new Spline(scene, camera, renderer, [
+  spline = new Spline(scene, [
     new THREE.Vector3(
       289.76843686945404,
       452.51481137238443,
@@ -88,6 +93,9 @@ function init() {
     ),
     new THREE.Vector3(-383.785318791128, 491.1365363371675, 47.869296953772746),
   ]);
+
+  spline.initControls(camera, cameraCtrl, renderer);
+
 }
 
 function animate() {
