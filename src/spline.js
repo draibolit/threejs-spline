@@ -4,53 +4,26 @@ import { GUI } from "three/examples/jsm/libs/dat.gui.module.js";
 
 class Spline {
   constructor(scene, new_positions) {
-    this.boxGeo = new THREE.BoxBufferGeometry(20, 20, 20); //const
-    this.splineHelperObjects = [];
-    this.splinePointsLength = 4; //const
-    this.positions = [];
+    this.splinePointsLength = new_positions.length;
+    this.positions = []; // save the common vecs of objs and spline
     this.point = new THREE.Vector3();
-    this.ARC_SEGMENTS = 200; //const
 
     this.scene = scene;
 
+    // Helper objs: initialize with zero coords, and save its positions
+    this.splineHelperObjects = [];
     for (let i = 0; i < this.splinePointsLength; i++) {
-      let obj = this.addSplineObject(this.positions[i]);
+      let obj = this.addSplineObject(null);
+      this.positions.push(obj.position); // will be referenced by spline
       this.splineHelperObjects.push(obj);
-      scene.add(obj);
     }
 
-    for (let i = 0; i < this.splinePointsLength; i++) {
-      this.positions.push(this.splineHelperObjects[i].position);
-    }
-
+    // Spline: initialize spline with no coords
     let curveGeo = new THREE.BufferGeometry();
     curveGeo.setAttribute(
       "position",
-      new THREE.BufferAttribute(new Float32Array(this.ARC_SEGMENTS * 3), 3)
+      new THREE.BufferAttribute(new Float32Array(Spline.numSegs() * 3), 3)
     );
-
-    let scope = this;
-    // Gui
-    const params = {
-      uniform: true,
-      tension: 0.5,
-      addPoint: scope.addPoint.bind(scope),
-      removePoint: scope.removePoint.bind(scope),
-    };
-
-    const gui = new GUI();
-    gui.add(params, "uniform");
-    gui
-      .add(params, "tension", 0, 1)
-      .step(0.01)
-      .onChange(function (value) {
-        spline.tension = value;
-        updateSplineOutline();
-      });
-    gui.add(params, "addPoint");
-    gui.add(params, "removePoint");
-    gui.open();
-
     this.spline = new THREE.CatmullRomCurve3(this.positions);
     this.spline.mesh = new THREE.Line(
       curveGeo.clone(),
@@ -59,23 +32,42 @@ class Spline {
         opacity: 0.35,
       })
     );
-    this.scene.add(this.spline.mesh);
 
-    this.load(new_positions);
-  }
-
-  load(new_positions) {
-    while (new_positions.length > this.positions.length) {
-      this.addPoint();
-    }
-    while (new_positions.length < this.positions.length) {
-      this.removePoint();
-    }
     for (let i = 0; i < this.positions.length; i++) {
       this.positions[i].copy(new_positions[i]);
     }
     this.updateSplineOutline();
+
+    this.scene.add(...this.splineHelperObjects);
+    this.scene.add(this.spline.mesh);
+
+    // Gui
+    // let scope = this;
+    // const params = {
+    //   uniform: true,
+    //   tension: 0.5,
+    //   addPoint: scope.addPoint.bind(scope),
+    //   removePoint: scope.removePoint.bind(scope),
+    // };
+    // const gui = new GUI();
+    // gui.add(params, "uniform");
+    // gui
+    //   .add(params, "tension", 0, 1)
+    //   .step(0.01)
+    //   .onChange(function (value) {
+    //     spline.tension = value;
+    //     updateSplineOutline();
+    //   });
+    // gui.add(params, "addPoint");
+    // gui.add(params, "removePoint");
+    // gui.open();
+
   }
+
+  static boxGeo(){
+     return new THREE.BoxBufferGeometry(20, 20, 20);
+  }
+  static numSegs(){ return 200;}
 
   initControls(camera, cameraCtrl, renderer) {
     this.transformControl = new TransformControls(camera, renderer.domElement);
@@ -96,22 +88,24 @@ class Spline {
     const material = new THREE.MeshLambertMaterial({
       color: Math.random() * 0xffffff,
     });
-    const object = new THREE.Mesh(this.boxGeo, material);
+    const object = new THREE.Mesh(Spline.boxGeo(), material);
     if (position) {
       object.position.copy(position);
     } else {
-      object.position.x = Math.random() * 1000 - 500;
-      object.position.y = Math.random() * 600;
-      object.position.z = Math.random() * 800 - 400;
+      object.position.x = 0;
+      object.position.y = 0;
+      object.position.z = 0;
     }
     object.castShadow = true;
     object.receiveShadow = true;
     return object;
   }
 
-  addPoint() {
+  // add point by a THREE.vector3
+  // TODO: need to add a point in the middle <29-12-20, Tuan Nguyen Anh> //
+  addPoint(vector3) {
     this.splinePointsLength++;
-    let obj = this.addSplineObject();
+    let obj = this.addSplineObject(vector3);
     this.splineHelperObjects.push(obj);
     this.scene.add(obj);
     this.positions.push(obj.position);
@@ -132,8 +126,8 @@ class Spline {
 
   updateSplineOutline() {
     const position = this.spline.mesh.geometry.attributes.position;
-    for (let i = 0; i < this.ARC_SEGMENTS; i++) {
-      const t = i / (this.ARC_SEGMENTS - 1);
+    for (let i = 0; i < Spline.numSegs(); i++) {
+      const t = i / (Spline.numSegs() - 1);
       this.spline.getPoint(t, this.point);
       position.setXYZ(i, this.point.x, this.point.y, this.point.z);
     }

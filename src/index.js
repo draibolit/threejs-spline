@@ -68,13 +68,14 @@ function init() {
   document.addEventListener("pointermove", onPointerMove, false);
 
   // Camera control
-let cameraCtrl = new OrbitControls(camera, renderer.domElement);
-cameraCtrl.damping = 0.2;
+  let cameraCtrl = new OrbitControls(camera, renderer.domElement);
+  cameraCtrl.damping = 0.2;
 
   /*******
    * Curves
    *********/
 
+  // num of vector >=2;
   spline = new Spline(scene, [
     new THREE.Vector3(
       289.76843686945404,
@@ -92,10 +93,15 @@ cameraCtrl.damping = 0.2;
       -6.958271935582161
     ),
     new THREE.Vector3(-383.785318791128, 491.1365363371675, 47.869296953772746),
+    new THREE.Vector3(
+      -583.785318791128,
+      591.1365363371675,
+      147.869296953772746
+    ),
   ]);
 
   spline.initControls(camera, cameraCtrl, renderer);
-
+  spline.addPoint( new THREE.Vector3(0,0,0));
 }
 
 function animate() {
