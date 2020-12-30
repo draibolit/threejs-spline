@@ -102,6 +102,7 @@ function init() {
 
   spline.initControls(camera, cameraCtrl, renderer);
   // spline.addControlPoint( new THREE.Vector3(0,0,0));
+  spline.removeControlPoint(1);
 
 }
 

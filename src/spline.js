@@ -1,3 +1,5 @@
+'use strict'
+
 import * as THREE from "three";
 import { TransformControls } from "three/examples/jsm/controls/TransformControls.js";
 import { GUI } from "three/examples/jsm/libs/dat.gui.module.js";
@@ -99,7 +101,7 @@ class Spline {
     return object;
   }
 
-  // add point by a THREE.vector3
+  // add point by a THREE.vector3, if no arg --> random position
   // TODO: need to add a point in the middle <29-12-20, Tuan Nguyen Anh> //
   addControlPoint(vector3) {
     let vec;
@@ -116,18 +118,29 @@ class Spline {
     this.splinePointsLength++;
     let helperObj = this._addHelperObj(vec);
     this.splineHelperObjects.push(helperObj);
-    this.positions.push(helperObj.position);
+    this.positions.push(helperObj.position); // todo: add to after a position here
     this.scene.add(helperObj);
     this._updateSplineOutline();
   }
 
-  removeControlPoint() {
+  // Remove a control point from a Pos; no arg --> last Pos
+  removeControlPoint(atPosition) {
     if (this.splinePointsLength <= 2) {
       return;
     }
-    const obj = this.splineHelperObjects.pop();
+
+    // let obj;
+    const obj;
+    if (atPosition){
+      [obj,] = this.splineHelperObjects.splice(atPosition, 1);
+      this.positions.splice(atPosition, 1);
+
+    }else{
+      obj = this.splineHelperObjects.pop();
+      this.positions.pop();
+    }
+
     this.splinePointsLength--;
-    this.positions.pop();
     if (this.transformControl.object === obj) this.transformControl.detach();
     this.scene.remove(obj);
     this._updateSplineOutline();
@@ -136,10 +149,10 @@ class Spline {
   // Update seg points
   _updateSplineOutline() {
     let tempPoint = new THREE.Vector3();
-    const meshPointPosition = this.spline.mesh.geometry.attributes.position; // get the mesh point
+    const meshPointPosition = this.spline.mesh.geometry.attributes.position; // get the mesh point reference
     for (let i = 0; i < Spline.numSegs(); i++) {
       const pos = i / (Spline.numSegs() - 1);
-      this.spline.getPoint(pos, tempPoint); // save to the immediate var
+      this.spline.getPoint(pos, tempPoint); // save spline point to the immediate var
       meshPointPosition.setXYZ(i, tempPoint.x, tempPoint.y, tempPoint.z); // push from immediate var to mesh point
     }
     meshPointPosition.needsUpdate = true;
