@@ -101,7 +101,8 @@ function init() {
   ]);
 
   spline.initControls(camera, cameraCtrl, renderer);
-  spline.addPoint( new THREE.Vector3(0,0,0));
+  // spline.addControlPoint( new THREE.Vector3(0,0,0));
+
 }
 
 function animate() {
