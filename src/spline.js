@@ -4,6 +4,12 @@ import * as THREE from "three";
 import { TransformControls } from "three/examples/jsm/controls/TransformControls.js";
 import { GUI } from "three/examples/jsm/libs/dat.gui.module.js";
 
+/*
+Create spline curve base on CatmullRomCurve3 algorithm
+  Each control points in the curve will be attached with an obj helper
+  Current problem: the more control points will be created, the more unsmoothy
+    the curve will be due to to fixed number of segs in its line mesh
+  */
 class Spline {
   constructor(scene, new_positions) {
     this.scene = scene;
@@ -20,7 +26,7 @@ class Spline {
     }
 
     // Spline: initialize spline with boilerplate of coords
-    this.spline = new THREE.CatmullRomCurve3(this.positions); // interpolate seg points from main points (positions)
+    this.spline = new THREE.CatmullRomCurve3(this.positions); // interpolate seg points from control points (positions)
     let curveGeo = new THREE.BufferGeometry();
     curveGeo.setAttribute(
       "position",
@@ -101,9 +107,9 @@ class Spline {
     return object;
   }
 
-  // add point by a THREE.vector3, if no arg --> random position
-  // TODO: need to add a point in the middle <29-12-20, Tuan Nguyen Anh> //
-  addControlPoint(vector3) {
+  // Add point by a THREE.vector3, if no arg --> random position
+  addControlPoint(vector3, afterPosition) {
+    // random if not vector3
     let vec;
     if (vector3) {
       vec = vector3;
@@ -115,10 +121,17 @@ class Spline {
       );
     }
 
+    // create new obj afterPosition
+    let  helperObj = this._addHelperObj(vec);
+    if (afterPosition){
+      this.splineHelperObjects.splice(afterPosition, 0, helperObj);
+      this.positions.splice(afterPosition, 0, helperObj.position);
+    }else{
+      this.splineHelperObjects.push(helperObj);
+      this.positions.push(helperObj.position);
+    }
+
     this.splinePointsLength++;
-    let helperObj = this._addHelperObj(vec);
-    this.splineHelperObjects.push(helperObj);
-    this.positions.push(helperObj.position); // todo: add to after a position here
     this.scene.add(helperObj);
     this._updateSplineOutline();
   }
@@ -129,8 +142,7 @@ class Spline {
       return;
     }
 
-    // let obj;
-    const obj;
+    let obj;
     if (atPosition){
       [obj,] = this.splineHelperObjects.splice(atPosition, 1);
       this.positions.splice(atPosition, 1);
@@ -160,3 +172,5 @@ class Spline {
 }
 
 export { Spline };
+
+// TODO: create name argument for functions <30-12-20, Tuan Nguyen Anh> //

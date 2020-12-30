@@ -7,7 +7,16 @@ import { Spline } from "./spline";
 
 let stats;
 let camera, scene, renderer;
+
 const raycaster = new THREE.Raycaster();
+// raycaster.params = {
+//   Mesh: {threshold: 0.1},
+//   Line: { threshold: 1 },
+//   LOD: {},
+//   Points: { threshold: 1 },
+//   Sprite: {},
+// };
+
 const onUpPosition = new THREE.Vector2();
 const onDownPosition = new THREE.Vector2();
 let pointer = new THREE.Vector2();
@@ -101,9 +110,10 @@ function init() {
   ]);
 
   spline.initControls(camera, cameraCtrl, renderer);
-  // spline.addControlPoint( new THREE.Vector3(0,0,0));
-  spline.removeControlPoint(1);
-
+  // spline.addControlPoint();
+  // spline.removeControlPoint(1);
+  // spline.addControlPoint(new THREE.Vector3(0,0,0), 1);
+  spline.addControlPoint(new THREE.Vector3(0, 0, 0), 2);
 }
 
 function animate() {
