@@ -110,10 +110,11 @@ function init() {
   ]);
 
   spline.initControls(camera, cameraCtrl, renderer);
-  // spline.addControlPoint();
   // spline.removeControlPoint(1);
   // spline.addControlPoint(new THREE.Vector3(0,0,0), 1);
   spline.addControlPoint(new THREE.Vector3(0, 0, 0), 2);
+  spline.activateCreatePoint(renderer.domElement, raycaster, camera);
+  spline.activateHighlight(renderer.domElement, raycaster, camera);
 }
 
 function animate() {

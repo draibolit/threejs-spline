@@ -1,4 +1,4 @@
-'use strict'
+"use strict";
 
 import * as THREE from "three";
 import { TransformControls } from "three/examples/jsm/controls/TransformControls.js";
@@ -32,10 +32,12 @@ class Spline {
       "position",
       new THREE.BufferAttribute(new Float32Array(Spline.numSegs() * 3), 3)
     );
+    // add the mesh to spline obj to easily manage (spline doesn't have mesh natively)
+    this.color = "red";
     this.spline.mesh = new THREE.Line(
       curveGeo,
       new THREE.LineBasicMaterial({
-        color: 0xff0000,
+        color: this.color,
         opacity: 0.35,
       })
     );
@@ -107,6 +109,47 @@ class Spline {
     return object;
   }
 
+  activateCreatePoint(renderDom, raycaster, camera) {
+    let scope = this;
+    renderDom.addEventListener("pointerdown", onPointerDown, false);
+    function onPointerDown(e) {
+      let rect = renderDom.getBoundingClientRect();
+      const mouse = {
+        x: ((e.clientX - rect.left) / (rect.width - rect.left)) * 2 - 1,
+        y: -((e.clientY - rect.top) / (rect.bottom - rect.top)) * 2 + 1,
+      };
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects([scope.spline.mesh]);
+      if (intersects.length > 0) {
+        const intersectPoint = intersects[0].point;
+        console.log("intersectPoint:", intersectPoint);
+        scope.addControlPoint(intersectPoint);
+        // TODO: need to determine the position in spline <31-12-20, Tuan Nguyen Anh> //
+      }
+    }
+  }
+
+  activateHighlight(renderDom, raycaster, camera) {
+    let scope = this;
+    renderDom.addEventListener("pointermove", onPointerMove, false);
+    function onPointerMove(e) {
+      let rect = renderDom.getBoundingClientRect();
+      const mouse = {
+        x: ((e.clientX - rect.left) / (rect.width - rect.left)) * 2 - 1,
+        y: -((e.clientY - rect.top) / (rect.bottom - rect.top)) * 2 + 1,
+      };
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects([scope.spline.mesh]);
+      if (intersects.length > 0) {
+        scope.spline.mesh.material.color.set("yellow");
+      } else {
+        if (scope.spline.mesh.material.color.color != scope.color) {
+          scope.spline.mesh.material.color.set(scope.color);
+        }
+      }
+    }
+  }
+
   // Add point by a THREE.vector3, if no arg --> random position
   addControlPoint(vector3, afterPosition) {
     // random if not vector3
@@ -122,11 +165,11 @@ class Spline {
     }
 
     // create new obj afterPosition
-    let  helperObj = this._addHelperObj(vec);
-    if (afterPosition){
+    let helperObj = this._addHelperObj(vec);
+    if (afterPosition) {
       this.splineHelperObjects.splice(afterPosition, 0, helperObj);
       this.positions.splice(afterPosition, 0, helperObj.position);
-    }else{
+    } else {
       this.splineHelperObjects.push(helperObj);
       this.positions.push(helperObj.position);
     }
@@ -143,11 +186,10 @@ class Spline {
     }
 
     let obj;
-    if (atPosition){
-      [obj,] = this.splineHelperObjects.splice(atPosition, 1);
+    if (atPosition) {
+      [obj] = this.splineHelperObjects.splice(atPosition, 1);
       this.positions.splice(atPosition, 1);
-
-    }else{
+    } else {
       obj = this.splineHelperObjects.pop();
       this.positions.pop();
     }
