@@ -27,6 +27,7 @@ class Spline {
 
     // Spline: initialize spline with boilerplate of coords
     this.spline = new THREE.CatmullRomCurve3(this.positions); // interpolate seg points from control points (positions)
+    this.spline.curveType = "catmullrom"; // to control the tension
     let curveGeo = new THREE.BufferGeometry();
     curveGeo.setAttribute(
       "position",
