@@ -115,6 +115,44 @@ function init() {
   spline.addControlPoint(new THREE.Vector3(0, 0, 0), 2);
   spline.activateCreatePoint(renderer.domElement, raycaster, camera);
   spline.activateHighlight(renderer.domElement, raycaster, camera);
+
+
+// --------------------------
+// Create original curve
+// var curve = new THREE.CatmullRomCurve3( [
+//     new THREE.Vector3( -10, 0, 10 ),
+//     new THREE.Vector3( -5, 5, 5 ),
+//     new THREE.Vector3( 0, 0, 0 ),
+//     new THREE.Vector3( 5, -5, 5 ),
+//     new THREE.Vector3( 50, 0, 50 )
+// ], false );
+
+// var searchPoint = new THREE.Vector3( 5, -5, 5 ); // Point we're looking for
+// var searchArray = [];   // Array for second curve
+// var uPosition = null; // Result is null for now
+
+// // Loop through curve.points to find our final point
+// for(var i = 0; i < curve.points.length; i++){
+//   debugger;
+//     searchArray.push(curve.points[i]);
+
+//     // Exit loop once point has been found
+//     if(searchPoint.equals(curve.points[i])){
+//         // Create shorter curve that stops at desired point
+//         var curve2 = new THREE.CatmullRomCurve3(searchArray);
+
+//         // Result is short length / original length
+//         uPosition = curve2.getLength() / curve.getLength();
+//         break;
+//     }
+// }
+
+// // Result is null if position not found
+// console.log(uPosition);
+
+// --------------------------
+//
+//
 }
 
 function animate() {
